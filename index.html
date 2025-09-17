@@ -1,0 +1,888 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Academia Virtual — Completo</title>
+  <meta name="description" content="Protótipo de aplicativo de academia virtual - HTML/CSS/JS single file" />
+  <style>
+    /* Reset simples */
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: Inter, system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial;
+    }
+    :root {
+      --bg: #0f1724; /* fundo escuro */
+      --card: #0b1220;
+      --muted: #9aa4b2;
+      --accent: #412ed0;
+      --glass: rgba(255, 255, 255, 0.04);
+      --radius: 12px;
+    }
+    body {
+      background: linear-gradient(180deg, #071025 0%, #071827 100%);
+      color: #e6eef8;
+      min-height: 100vh;
+      padding: 24px;
+    }
+    .app {
+      max-width: 1100px;
+      margin: 0 auto;
+      display: grid;
+      grid-template-columns: 320px 1fr;
+      gap: 20px;
+    }
+
+    /* SIDEBAR */
+    .sidebar {
+      background: linear-gradient(180deg, rgba(255, 255, 255, 0.02), rgba(255, 255, 255, 0.01));
+      padding: 18px;
+      border-radius: 16px;
+      min-height: 80vh;
+      display: flex;
+      flex-direction: column;
+    }
+    .logo {
+      display: flex;
+      gap: 12px;
+      align-items: center;
+      margin-bottom: 18px;
+    }
+    .logo .badge {
+      width: 44px;
+      height: 44px;
+      border-radius: 10px;
+      background: linear-gradient(135deg, var(--accent), #4cc0ff);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 700;
+      color: #071227;
+    }
+    .nav {
+      margin-top: 12px;
+      flex-grow: 1;
+    }
+    .nav button {
+      display: flex;
+      gap: 10px;
+      align-items: center;
+      width: 100%;
+      padding: 10px;
+      border-radius: 10px;
+      border: 0;
+      background: transparent;
+      color: var(--muted);
+      cursor: pointer;
+      font-size: 15px;
+      user-select: none;
+      transition: background-color 0.3s, color 0.3s;
+    }
+    .nav button.active {
+      background: var(--glass);
+      color: #fff;
+    }
+
+    /* Profile mini */
+    .profile-mini {
+      display: flex;
+      gap: 12px;
+      align-items: center;
+      margin-bottom: 16px;
+    }
+    .profile-mini img {
+      width: 56px;
+      height: 56px;
+      border-radius: 10px;
+      object-fit: cover;
+    }
+
+    /* Conta buttons */
+    hr {
+      margin: 14px 0;
+      border-color: rgba(255, 255, 255, 0.03);
+      border-style: solid;
+      border-width: 1px 0 0 0;
+    }
+    .btn {
+      padding: 10px;
+      border-radius: 10px;
+      border: 0;
+      background: var(--accent);
+      color: #071227;
+      font-weight: 600;
+      cursor: pointer;
+      user-select: none;
+      transition: background-color 0.3s;
+    }
+    .btn:hover {
+      background: #5a3de0;
+    }
+    .btn.ghost {
+      background: transparent;
+      border: 1px solid rgba(255, 255, 255, 0.06);
+      color: var(--muted);
+    }
+    .btn.ghost:hover {
+      background: rgba(255, 255, 255, 0.05);
+    }
+    .btn[disabled] {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+
+    /* MAIN */
+    .main {
+      min-height: 80vh;
+      display: flex;
+      flex-direction: column;
+    }
+    .topbar {
+      display: flex;
+      gap: 12px;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 18px;
+    }
+    .search {
+      flex: 1;
+      margin-right: 12px;
+    }
+    .search input {
+      width: 100%;
+      padding: 14px;
+      border-radius: 12px;
+      border: 0;
+      background: rgba(255, 255, 255, 0.03);
+      color: #fff;
+      font-size: 15px;
+    }
+    .profile {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .profile img {
+      width: 44px;
+      height: 44px;
+      border-radius: 50%;
+      object-fit: cover;
+      cursor: pointer;
+    }
+
+    /* Sections */
+    .sections {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 18px;
+      flex-grow: 1;
+    }
+    .card {
+      background: linear-gradient(180deg, rgba(255, 255, 255, 0.02), rgba(255, 255, 255, 0.01));
+      padding: 16px;
+      border-radius: 12px;
+    }
+    h2 {
+      font-size: 18px;
+      margin-bottom: 12px;
+    }
+
+    /* horizontal lists */
+    .hlist {
+      display: flex;
+      gap: 12px;
+      overflow-x: auto;
+      padding-bottom: 6px;
+    }
+    .hlist::-webkit-scrollbar {
+      height: 8px;
+    }
+    .hlist::-webkit-scrollbar-thumb {
+      background: rgba(255, 255, 255, 0.06);
+      border-radius: 20px;
+    }
+    .classCard {
+      min-width: 220px;
+      background: linear-gradient(180deg, rgba(255, 255, 255, 0.02), rgba(255, 255, 255, 0.01));
+      padding: 10px;
+      border-radius: 12px;
+      cursor: pointer;
+      transition: transform 0.3s;
+      user-select: none;
+    }
+    .classCard:hover {
+      transform: scale(1.05);
+    }
+    .classCard img {
+      width: 100%;
+      height: 120px;
+      object-fit: cover;
+      border-radius: 8px;
+      margin-bottom: 8px;
+    }
+    .meta {
+      font-size: 13px;
+      color: var(--muted);
+    }
+
+    /* categories */
+    .cats {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+    .cat {
+      background: rgba(255, 255, 255, 0.02);
+      padding: 10px 12px;
+      border-radius: 10px;
+      display: flex;
+      gap: 8px;
+      align-items: center;
+      cursor: pointer;
+      user-select: none;
+      transition: background-color 0.3s;
+    }
+    .cat:hover {
+      background: rgba(255, 255, 255, 0.05);
+    }
+    .cat .ico {
+      width: 36px;
+      height: 36px;
+      border-radius: 8px;
+      background: rgba(0, 0, 0, 0.2);
+      display: grid;
+      place-items: center;
+      font-size: 20px;
+    }
+
+    /* Aula page mock */
+    .player {
+      background: #000;
+      border-radius: 12px;
+      padding: 8px;
+    }
+    video {
+      width: 100%;
+      height: 360px;
+      border-radius: 8px;
+      background: #000;
+    }
+    .lesson-details {
+      display: flex;
+      gap: 18px;
+      margin-top: 12px;
+      flex-wrap: wrap;
+    }
+    .lesson-left {
+      flex: 2;
+      min-width: 280px;
+    }
+    .lesson-right {
+      flex: 1;
+      min-width: 240px;
+    }
+    .instructor {
+      display: flex;
+      gap: 10px;
+      align-items: center;
+    }
+    .instructor img {
+      width: 48px;
+      height: 48px;
+      border-radius: 8px;
+      object-fit: cover;
+    }
+
+    .progress {
+      height: 12px;
+      background: rgba(255, 255, 255, 0.06);
+      border-radius: 8px;
+      overflow: hidden;
+    }
+    .progress > i {
+      display: block;
+      height: 100%;
+      background: linear-gradient(90deg, var(--accent), #4cc0ff);
+      width: 45%;
+      transition: width 0.3s;
+    }
+
+    /* profile */
+    .profile-card {
+      text-align: center;
+    }
+    .profile-card img {
+      width: 86px;
+      height: 86px;
+      border-radius: 50%;
+      margin: 0 auto;
+      object-fit: cover;
+    }
+    .profile-actions {
+      display: flex;
+      gap: 8px;
+      flex-direction: column;
+      margin-top: 12px;
+    }
+
+    /* small helper */
+    .muted {
+      color: var(--muted);
+    }
+    textarea {
+      width: 100%;
+      padding: 10px;
+      border-radius: 8px;
+      border: 0;
+      background: rgba(255, 255, 255, 0.03);
+      color: #fff;
+      font-size: 14px;
+      resize: vertical;
+    }
+
+    /* modal */
+    .modal-backdrop {
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,0.6);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      z-index: 50;
+    }
+    .modal {
+      width: 420px;
+      max-width: calc(100% - 32px);
+      background: linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));
+      padding: 18px;
+      border-radius: 12px;
+    }
+    .modal h3 { margin-bottom: 10px; }
+
+    /* responsive */
+    @media (max-width: 900px) {
+      .app {
+        grid-template-columns: 1fr;
+        padding: 12px;
+      }
+      .sidebar {
+        order: 2;
+      }
+      .main {
+        order: 1;
+      }
+      .lesson-details {
+        flex-direction: column;
+      }
+      .lesson-left,
+      .lesson-right {
+        min-width: 100%;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="app">
+    <!-- SIDEBAR -->
+    <aside class="sidebar">
+      <div class="logo">
+        <div class="badge">MV</div>
+        <div>
+          <div style="font-weight:700">Matrix Virtual</div>
+          <div class="muted" style="font-size:13px">Seu parceiro de treino</div>
+        </div>
+      </div>
+
+      <div class="profile-mini">
+        <img src="https://images.unsplash.com/photo-1544005313-94ddf0286df2?w=400&q=60" alt="user" />
+        <div>
+          <div style="font-weight:700" id="sidebarName">Olá, Visitante</div>
+          <div class="muted" style="font-size:13px" id="sidebarLevel">Nível: Iniciante</div>
+        </div>
+      </div>
+
+      <nav class="nav" aria-label="Navegação">
+        <button class="active" data-view="home">🏠 Inicial</button>
+        <button data-view="videos">🎥 Vídeos</button>
+        <button data-view="categories">📂 Categorias</button>
+        <button data-view="live">🔴 Aulas Ao Vivo</button>
+        <button data-view="history">📈 Progresso</button>
+        <button data-view="profile">👤 Perfil</button>
+      </nav>
+
+      <hr />
+      <div class="muted" style="font-size:13px">Conta</div>
+      <div style="display:flex;gap:8px;margin-top:8px">
+        <button class="btn" style="flex:1" id="openLogin">Entrar</button>
+        <button class="btn ghost" style="flex:1" id="openSubscribe">Assinar</button>
+      </div>
+    </aside>
+
+    <!-- MAIN -->
+    <main class="main">
+      <div class="topbar">
+        <div class="search">
+          <input placeholder="Buscar aulas, instrutores, modalidades..." id="searchInput" aria-label="Buscar aulas" />
+        </div>
+        <div class="profile">
+          <button class="btn ghost" id="btnQuestionnaire">Questionário</button>
+          <img src="https://images.unsplash.com/photo-1545996124-6f6d9b9fd1c8?w=400&q=60" alt="avatar" />
+        </div>
+      </div>
+
+      <!-- HOME VIEW -->
+      <section class="sections" id="view-home">
+        <div class="card">
+          <h2>Para Você</h2>
+          <div class="hlist" id="personalizedList" aria-live="polite"></div>
+        </div>
+
+        <div class="card" id="aulas-dia">
+          <h2>Aulas do Dia</h2>
+          <div class="hlist" id="todayList"></div>
+        </div>
+
+        <div class="card">
+          <h2>Populares Agora</h2>
+          <div class="hlist" id="popularList"></div>
+        </div>
+
+        <div class="card">
+          <h2>Aulas Ao Vivo</h2>
+          <div class="hlist" id="liveList"></div>
+        </div>
+
+        <div class="card">
+          <h2>Novidades</h2>
+          <div class="hlist" id="newsList"></div>
+        </div>
+
+        <!-- Aula exemplo -->
+        <div class="card" id="lessonCard">
+          <h2>Tela da Aula (Exemplo)</h2>
+          <div class="player">
+            <video controls id="videoPlayer" poster="https://images.unsplash.com/photo-1554284126-aa88f22d8d6b?w=800&q=60">
+              <source src="vd1.mp4" type="video/mp4" />
+              Seu navegador não suporta vídeo.
+            </video>
+          </div>
+
+          <div class="lesson-details">
+            <div class="lesson-left">
+              <h3 id="lessonTitle">Treino HIIT - 30 min</h3>
+              <div class="instructor">
+                <img src="https://images.unsplash.com/photo-1547425260-76bcadfb4f2c?w=200&q=60" alt="instrutor" />
+                <div>
+                  <div style="font-weight:700" id="lessonInstructor">Instrutor: Lucas Silva</div>
+                  <div class="muted" id="lessonMeta">Nível: Intermediário • 30 min</div>
+                </div>
+              </div>
+
+              <div style="margin-top:10px">
+                <div style="font-weight:700">Descrição</div>
+                <div class="muted" style="margin-top:6px" id="lessonDescription">
+                  Treino intenso para queimar calorias, com circuitos de cardio e resistência. Equipamento opcional: halteres leves.
+                </div>
+              </div>
+
+              <div style="margin-top:12px">
+                <div style="font-weight:700">Lista de exercícios</div>
+                <ol class="muted" style="margin-top:6px" id="exerciseList">
+                  <li>Aquecimento - 5 min</li>
+                  <li>Sprint no lugar - 3x (40s ON / 20s OFF)</li>
+                  <li>Agachamento com salto - 3x</li>
+                  <li>Prancha - 3x</li>
+                </ol>
+              </div>
+
+              <div style="margin-top:12px">
+                <div style="font-weight:700">Comentários</div>
+                <textarea id="commentField" rows="3" placeholder="Escreva um comentário..."></textarea>
+                <div style="display:flex;gap:8px;margin-top:8px">
+                  <button class="btn" id="sendComment">Enviar</button>
+                  <div class="muted" id="commentStatus" style="align-self:center"></div>
+                </div>
+              </div>
+            </div>
+
+            <aside class="lesson-right">
+              <div class="card profile-card">
+                <img src="https://images.unsplash.com/photo-1545996124-6f6d9b9fd1c8?w=400&q=60" alt="user" />
+                <div style="font-weight:700;margin-top:8px" id="progressName">Seu Progresso</div>
+                <div class="muted" style="font-size:13px" id="progressCount">21 treinos este mês</div>
+                <div style="margin-top:10px">
+                  <div class="progress"><i style="width:45%"></i></div>
+                  <div class="muted" style="font-size:13px;margin-top:6px">Meta: 3x por semana</div>
+                </div>
+                <div class="profile-actions">
+                  <button class="btn ghost">Histórico</button>
+                  <button class="btn ghost">Calendário</button>
+                  <button class="btn">Configurações</button>
+                </div>
+              </div>
+
+              <div class="card" style="margin-top:12px">
+                <div style="font-weight:700">Aulas Relacionadas</div>
+                <div class="muted" id="relatedList" style="margin-top:8px">HIIT curto • Cardio • Força</div>
+              </div>
+            </aside>
+          </div>
+        </div>
+      </section>
+
+      <!-- VIDEOS VIEW -->
+      <section class="sections" id="view-videos" style="display:none">
+        <div class="card">
+          <h2>Todos os vídeos</h2>
+          <div class="hlist" id="cardsContainer"></div>
+        </div>
+      </section>
+
+      <!-- CATEGORIES VIEW -->
+      <section class="sections" id="view-categories" style="display:none">
+        <div class="card">
+          <h2>Categorias</h2>
+          <div class="cats" id="categoryGrid"></div>
+        </div>
+      </section>
+
+      <!-- LIVE VIEW -->
+      <section class="sections" id="view-live" style="display:none">
+        <div class="card">
+          <h2>Aulas ao Vivo</h2>
+          <div class="hlist" id="liveContainer"></div>
+        </div>
+      </section>
+
+      <!-- HISTORY VIEW -->
+      <section class="sections" id="view-history" style="display:none">
+        <div class="card">
+          <h2>Seu Progresso</h2>
+          <p class="muted">Sem dados reais (protótipo). Aqui você veria: histórico de treinos, metas, peso, e evolução.</p>
+          <div style="margin-top:12px">
+            <div style="font-weight:700">Resumo Mensal</div>
+            <div class="muted" style="margin-top:8px">Treinos completados: <strong id="summaryCompleted">21</strong></div>
+            <div class="muted" style="margin-top:6px">Horas: <strong id="summaryHours">15h</strong></div>
+          </div>
+        </div>
+      </section>
+
+      <!-- PROFILE VIEW -->
+      <section class="sections" id="view-profile" style="display:none">
+        <div class="card profile-card">
+          <img src="https://images.unsplash.com/photo-1544005313-94ddf0286df2?w=400&q=60" alt="perfil" />
+          <div style="font-weight:700;margin-top:8px" id="profileName">Olá, Visitante</div>
+          <div class="muted" style="font-size:13px" id="profileLevel">Nível: Iniciante</div>
+          <div class="profile-actions" style="margin-top:12px">
+            <button class="btn ghost" id="editProfile">Editar Perfil</button>
+            <button class="btn ghost" id="preferences">Preferências</button>
+            <button class="btn" id="logoutBtn">Sair</button>
+          </div>
+        </div>
+      </section>
+    </main>
+  </div>
+
+  <!-- Modal Login -->
+  <div class="modal-backdrop" id="modalBackdrop" role="dialog" aria-modal="true" aria-hidden="true">
+    <div class="modal" role="document" aria-labelledby="modalTitle">
+      <h3 id="modalTitle">Entrar na Conta</h3>
+      <div style="display:flex;flex-direction:column;gap:8px">
+        <input id="loginEmail" placeholder="Email" style="padding:10px;border-radius:8px;border:0;background:rgba(255,255,255,0.03);color:#fff" />
+        <input id="loginPass" placeholder="Senha" type="password" style="padding:10px;border-radius:8px;border:0;background:rgba(255,255,255,0.03);color:#fff" />
+        <div style="display:flex;gap:8px;margin-top:6px">
+          <button class="btn" id="doLogin">Entrar</button>
+          <button class="btn ghost" id="closeModal">Cancelar</button>
+        </div>
+        <div class="muted" id="loginStatus" style="margin-top:6px"></div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    /* ---------- Dados de exemplo ---------- */
+    const sampleVideos = [
+      { id: 'v1', title: 'HIIT - 30 min', duration: '30 min', level: 'Intermediário', thumb: 'https://images.unsplash.com/photo-1554284126-aa88f22d8d6b?w=800&q=60', instructor: 'Lucas Silva', src: 'vd1.mp4' },
+      { id: 'v2', title: 'Yoga Relaxante', duration: '20 min', level: 'Iniciante', thumb: 'https://images.unsplash.com/photo-1605296867304-46d5465a13f1?w=800&q=60', instructor: 'Mariana Rocha', src: 'vd2.mp4' },
+      { id: 'v3', title: 'Força - Pernas', duration: '25 min', level: 'Avançado', thumb: 'https://images.unsplash.com/photo-1558611848-73f7eb4001d4?w=800&q=60', instructor: 'Rafael Costa', src: 'vd3.mp4' },
+      { id: 'v4', title: 'Cardio Leve', duration: '15 min', level: 'Iniciante', thumb: 'https://images.unsplash.com/photo-1526406915895-37c22e14f1e8?w=800&q=60', instructor: 'Ana Paula', src: 'vd4.mp4' },
+      { id: 'v5', title: 'Mobilidade', duration: '12 min', level: 'Todos', thumb: 'https://images.unsplash.com/photo-1546484959-f6c2b1e77e6b?w=800&q=60', instructor: 'Felipe Gomes', src: 'vd5.mp4' }
+    ];
+
+    const categories = [
+      { id: 'c1', name: 'HIIT', icon: '🔥' },
+      { id: 'c2', name: 'Yoga', icon: '🧘' },
+      { id: 'c3', name: 'Força', icon: '🏋️' },
+      { id: 'c4', name: 'Cardio', icon: '🏃' },
+      { id: 'c5', name: 'Alongamento', icon: '🦵' },
+      { id: 'c6', name: 'Pilates', icon: '🤸' }
+    ];
+
+    const liveSessions = [
+      { id: 'l1', title: 'Aula ao vivo - Cardio 45min', time: 'Hoje • 19:00', thumb: 'https://images.unsplash.com/photo-1554284126-aa88f22d8d6b?w=800&q=60' },
+      { id: 'l2', title: 'Alongamento ao vivo', time: 'Amanhã • 08:00', thumb: 'https://images.unsplash.com/photo-1605296867304-46d5465a13f1?w=800&q=60' }
+    ];
+
+    /* ---------- Elementos do DOM ---------- */
+    const navButtons = document.querySelectorAll(".nav button");
+    const sections = document.querySelectorAll(".sections");
+    const personalizedList = document.getElementById('personalizedList');
+    const todayList = document.getElementById('todayList');
+    const popularList = document.getElementById('popularList');
+    const liveList = document.getElementById('liveList');
+    const newsList = document.getElementById('newsList');
+    const cardsContainer = document.getElementById('cardsContainer');
+    const categoryGrid = document.getElementById('categoryGrid');
+    const liveContainer = document.getElementById('liveContainer');
+    const searchInput = document.getElementById('searchInput');
+    const videoPlayer = document.getElementById('videoPlayer');
+    const lessonTitle = document.getElementById('lessonTitle');
+    const lessonInstructor = document.getElementById('lessonInstructor');
+    const lessonDescription = document.getElementById('lessonDescription');
+    const lessonMeta = document.getElementById('lessonMeta');
+    const exerciseList = document.getElementById('exerciseList');
+    const commentField = document.getElementById('commentField');
+    const sendComment = document.getElementById('sendComment');
+    const commentStatus = document.getElementById('commentStatus');
+
+    const modalBackdrop = document.getElementById('modalBackdrop');
+    const openLogin = document.getElementById('openLogin');
+    const closeModal = document.getElementById('closeModal');
+    const doLogin = document.getElementById('doLogin');
+    const loginStatus = document.getElementById('loginStatus');
+
+    const btnQuestionnaire = document.getElementById('btnQuestionnaire');
+    const openSubscribe = document.getElementById('openSubscribe');
+
+    /* ---------- Funções de renderização ---------- */
+    function createCard(video) {
+      const el = document.createElement('div');
+      el.className = 'classCard';
+      el.tabIndex = 0;
+      el.innerHTML = `
+        <img src="${video.thumb}" alt="${video.title}" />
+        <div style="font-weight:600">${video.title}</div>
+        <div class="meta">${video.duration} • ${video.level}</div>
+        <div class="muted" style="font-size:12px;margin-top:6px">Instrutor: ${video.instructor}</div>
+      `;
+      el.addEventListener('click', () => openLesson(video));
+      el.addEventListener('keypress', (e) => { if (e.key === 'Enter') openLesson(video); });
+      return el;
+    }
+
+    function openLesson(video) {
+      // Carrega dados na "tela da aula"
+      lessonTitle.textContent = video.title;
+      lessonInstructor.textContent = 'Instrutor: ' + video.instructor;
+      lessonDescription.textContent = 'Treino projetado para ' + video.level + '. Descrição de exemplo para o protótipo.';
+      lessonMeta.textContent = `Nível: ${video.level} • ${video.duration}`;
+      // exemplo lista de exercícios curta
+      exerciseList.innerHTML = `
+        <li>Aquecimento - 5 min</li>
+        <li>Exercício principal - 15 min</li>
+        <li>Condicionamento - 8 min</li>
+        <li>Alongamento - 2 min</li>
+      `;
+      // troca o vídeo (no protótipo usamos a src do objeto, se existir)
+      if (video.src) {
+        const source = videoPlayer.querySelector('source');
+        source.src = video.src;
+        videoPlayer.load();
+      }
+      // garante que a view da aula está visível (view-home contém a aula)
+      showView('home');
+      // rolar a tela até a aula
+      document.getElementById('lessonCard').scrollIntoView({ behavior: 'smooth' });
+    }
+
+    function renderLists() {
+      // personalized (pegar 3 primeiros como exemplo)
+      personalizedList.innerHTML = '';
+      sampleVideos.slice(0,3).forEach(v => personalizedList.appendChild(createCard(v)));
+
+      // todayList - 2 itens
+      todayList.innerHTML = '';
+      sampleVideos.slice(1,3).forEach(v => todayList.appendChild(createCard(v)));
+
+      // popularList - ordenar por título (exemplo)
+      popularList.innerHTML = '';
+      sampleVideos.slice().sort((a,b)=> a.title > b.title ? 1 : -1).slice(0,4).forEach(v => popularList.appendChild(createCard(v)));
+
+      // liveList
+      liveList.innerHTML = '';
+      liveSessions.forEach(l => {
+        const el = document.createElement('div');
+        el.className = 'classCard';
+        el.innerHTML = `
+          <img src="${l.thumb}" alt="${l.title}" />
+          <div style="font-weight:600">${l.title}</div>
+          <div class="meta">${l.time}</div>
+        `;
+        el.addEventListener('click', ()=> alert('Entrando na sala ao vivo: ' + l.title));
+        liveList.appendChild(el);
+      });
+
+      // newsList - usar 2 itens fictícios
+      newsList.innerHTML = '';
+      const news1 = {title:'Novo plano semana VIP', subtitle:'Descontos em treinos personalizados', img: sampleVideos[0].thumb};
+      const news2 = {title:'Desafio de 14 dias', subtitle:'Participe e ganhe medalha', img: sampleVideos[1].thumb};
+      [news1, news2].forEach(n => {
+        const el = document.createElement('div');
+        el.className = 'classCard';
+        el.innerHTML = `<img src="${n.img}" alt="${n.title}" /><div style="font-weight:600">${n.title}</div><div class="meta">${n.subtitle}</div>`;
+        newsList.appendChild(el);
+      });
+
+      // todos os vídeos
+      cardsContainer.innerHTML = '';
+      sampleVideos.forEach(v => cardsContainer.appendChild(createCard(v)));
+
+      // categorias
+      categoryGrid.innerHTML = '';
+      categories.forEach(c => {
+        const el = document.createElement('div');
+        el.className = 'cat';
+        el.tabIndex = 0;
+        el.innerHTML = `<div class="ico">${c.icon}</div><div style="font-weight:600">${c.name}</div>`;
+        el.addEventListener('click', ()=> alert('Filtrar por ' + c.name));
+        categoryGrid.appendChild(el);
+      });
+
+      // liveContainer (detalhe)
+      liveContainer.innerHTML = '';
+      liveSessions.forEach(l => {
+        const el = document.createElement('div');
+        el.className = 'classCard';
+        el.innerHTML = `<img src="${l.thumb}" alt="${l.title}" /><div style="font-weight:600">${l.title}</div><div class="meta">${l.time}</div>`;
+        liveContainer.appendChild(el);
+      });
+    }
+
+    /* ---------- Navegação entre views ---------- */
+    function showView(name) {
+      // name esperado: home, videos, categories, live, history, profile
+      navButtons.forEach(b => b.classList.toggle('active', b.dataset.view === name));
+      sections.forEach(sec => sec.style.display = 'none');
+      const viewId = 'view-' + name;
+      const el = document.getElementById(viewId);
+      if (el) {
+        el.style.display = (name === 'home' || name === 'videos' || name === 'categories' || name === 'live' || name === 'history' || name === 'profile') ? 'grid' : 'block';
+      }
+    }
+
+    navButtons.forEach(btn => {
+      btn.addEventListener('click', () => {
+        showView(btn.dataset.view);
+      });
+    });
+
+    // inicializar listas e view
+    renderLists();
+    showView('home');
+
+    /* ---------- Pesquisa simples ---------- */
+    searchInput.addEventListener('input', (e)=>{
+      const q = e.target.value.trim().toLowerCase();
+      if (!q) {
+        renderLists();
+        return;
+      }
+      // filtrar pelos títulos
+      const results = sampleVideos.filter(v => v.title.toLowerCase().includes(q) || v.instructor.toLowerCase().includes(q));
+      // mostrar apenas na view vídeos
+      cardsContainer.innerHTML = '';
+      if (results.length) {
+        results.forEach(r => cardsContainer.appendChild(createCard(r)));
+      } else {
+        const no = document.createElement('div');
+        no.className = 'card';
+        no.textContent = 'Nenhum resultado encontrado.';
+        cardsContainer.appendChild(no);
+      }
+      showView('videos');
+    });
+
+    /* ---------- Comentários (simulado) ---------- */
+    sendComment.addEventListener('click', () => {
+      const text = commentField.value.trim();
+      if (!text) {
+        commentStatus.textContent = 'Digite algo antes de enviar.';
+        return;
+      }
+      commentStatus.textContent = 'Enviando...';
+      // simula envio
+      setTimeout(() => {
+        commentStatus.textContent = 'Comentário enviado ✔️';
+        commentField.value = '';
+        setTimeout(()=> commentStatus.textContent = '', 2500);
+      }, 800);
+    });
+
+    /* ---------- Modal login ---------- */
+    function openModal() {
+      modalBackdrop.style.display = 'flex';
+      modalBackdrop.setAttribute('aria-hidden', 'false');
+    }
+    function closeModalFn() {
+      modalBackdrop.style.display = 'none';
+      modalBackdrop.setAttribute('aria-hidden', 'true');
+      loginStatus.textContent = '';
+    }
+    openLogin.addEventListener('click', openModal);
+    closeModal.addEventListener('click', closeModalFn);
+    modalBackdrop.addEventListener('click', (e) => {
+      if (e.target === modalBackdrop) closeModalFn();
+    });
+    doLogin.addEventListener('click', () => {
+      const email = document.getElementById('loginEmail').value.trim();
+      const pass = document.getElementById('loginPass').value.trim();
+      if (!email || !pass) {
+        loginStatus.textContent = 'Preencha email e senha.';
+        return;
+      }
+      loginStatus.textContent = 'Autenticando...';
+      setTimeout(() => {
+        // no protótipo suponha login bem-sucedido
+        loginStatus.textContent = 'Bem-vindo, ' + email.split('@')[0] + '!';
+        document.getElementById('sidebarName').textContent = 'Olá, ' + email.split('@')[0];
+        document.getElementById('profileName').textContent = email.split('@')[0];
+        document.getElementById('profileLevel').textContent = 'Nível: Intermediário';
+        document.getElementById('progressName').textContent = 'Progresso de ' + email.split('@')[0];
+        setTimeout(() => closeModalFn(), 900);
+      }, 900);
+    });
+
+    /* ---------- Questionário / Subscribe handlers (exemplo) ---------- */
+    btnQuestionnaire.addEventListener('click', ()=> {
+      alert('Questionário: Em um app real aqui abriríamos um formulário para coletar objetivos e nível.');
+    });
+    openSubscribe.addEventListener('click', ()=> {
+      alert('Assinatura: Mostrar opções de planos (mensal/anual) — protótipo.');
+    });
+
+    /* ---------- Logout / editar ---------- */
+    document.getElementById('logoutBtn').addEventListener('click', ()=>{
+      if (confirm('Deseja realmente sair?')) {
+        document.getElementById('sidebarName').textContent = 'Olá, Visitante';
+        document.getElementById('profileName').textContent = 'Olá, Visitante';
+        document.getElementById('profileLevel').textContent = 'Nível: Iniciante';
+        alert('Desconectado');
+      }
+    });
+
+    document.getElementById('editProfile').addEventListener('click', ()=> alert('Abrir editor de perfil (protótipo).'));
+
+    /* ---------- Acessibilidade: tecla ESC fecha modal ---------- */
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape' && modalBackdrop.style.display === 'flex') closeModalFn();
+    });
+
+    /* ---------- Inicial: carregar primeiro vídeo na tela ---------- */
+    if (sampleVideos.length) {
+      openLesson(sampleVideos[0]);
+    }
+  </script>
+</body>
+</html>
